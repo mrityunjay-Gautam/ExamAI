@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JEE / NEET Practice | ExamAI</title>
+  <meta name="description" content="Generate JEE and NEET practice papers, track score analysis, and solve doubts with AI on ExamAI.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    .practice-page{
+      width:min(var(--container), calc(100% - 20px));
+      margin:22px auto 80px;
+    }
+
+    .practice-hero{
+      background:
+        radial-gradient(circle at top left, rgba(91,92,226,0.12), transparent 24%),
+        linear-gradient(135deg, #f9fbff 0%, #eef2ff 50%, #ede9fe 100%);
+      border:1px solid rgba(91,92,226,0.10);
+      border-radius:30px;
+      box-shadow:var(--shadow-lg);
+      padding:26px 18px 22px;
+      overflow:hidden;
+    }
+
+    body.dark-mode .practice-hero{
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.05), transparent 24%),
+        linear-gradient(135deg, #111827 0%, #182235 50%, #1a1930 100%);
+      border-color:rgba(255,255,255,0.06);
+    }
+
+    .practice-hero-grid{
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:22px;
+      align-items:center;
+    }
+
+    .practice-kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 14px;
+      border-radius:999px;
+      background:rgba(91,92,226,0.10);
+      color:var(--primary);
+      font-size:13px;
+      font-weight:600;
+      margin-bottom:14px;
+    }
+
+    .practice-hero h1{
+      font-size:clamp(30px, 5vw, 54px);
+      line-height:1.12;
+      margin-bottom:12px;
+      letter-spacing:-0.8px;
+    }
+
+    .practice-hero h1 span{
+      background:linear-gradient(135deg,var(--primary),var(--secondary));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+
+    .practice-hero p{
+      color:var(--text-soft);
+      font-size:15px;
+      line-height:1.8;
+      margin-bottom:18px;
+      max-width:720px;
+    }
+
+    .practice-hero-points{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px;
+    }
+
+    .practice-hero-point{
+      background:rgba(255,255,255,0.78);
+      border:1px solid rgba(255,255,255,0.85);
+      border-radius:18px;
+      padding:14px;
+      box-shadow:var(--shadow-sm);
+    }
+
+    body.dark-mode .practice-hero-point{
+      background:rgba(255,255,255,0.03);
+      border-color:rgba(255,255,255,0.06);
+    }
+
+    .practice-hero-point strong{
+      display:block;
+      font-size:17px;
+      margin-bottom:4px;
+    }
+
+    .practice-hero-point span{
+      font-size:12px;
+      line-height:1.5;
+      color:var(--text-soft);
+    }
+
+    .practice-side-preview{
+      display:grid;
+      gap:14px;
+    }
+
+    .preview-card{
+      background:var(--bg-soft);
+      border:1px solid var(--border);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      padding:18px;
+    }
+
+    .preview-card-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:14px;
+    }
+
+    .preview-card-title{
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .preview-pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:5px 10px;
+      border-radius:999px;
+      background:#eef2ff;
+      color:var(--primary);
+      font-size:11px;
+      font-weight:700;
+    }
+
+    .preview-stat-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      margin-bottom:14px;
+    }
+
+    .preview-stat{
+      background:var(--bg-muted);
+      border-radius:16px;
+      padding:12px;
+      text-align:left;
+    }
+
+    .preview-stat strong{
+      display:block;
+      font-size:17px;
+      margin-bottom:3px;
+    }
+
+    .preview-stat span{
+      font-size:11px;
+      color:var(--text-soft);
+    }
+
+    .preview-bars{
+      display:flex;
+      align-items:flex-end;
+      gap:8px;
+      height:120px;
+    }
+
+    .preview-bars span{
+      flex:1;
+      border-radius:12px 12px 5px 5px;
+      background:linear-gradient(180deg,var(--secondary),var(--primary));
+    }
+
+    .preview-bars span:nth-child(1){height:46%}
+    .preview-bars span:nth-child(2){height:68%}
+    .preview-bars span:nth-child(3){height:55%}
+    .preview-bars span:nth-child(4){height:84%}
+    .preview-bars span:nth-child(5){height:72%}
+
+    .practice-sections{
+      margin-top:24px;
+    }
+
+    .practice-tabs{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      margin-bottom:18px;
+      position:sticky;
+      top:92px;
+      z-index:20;
+      background:transparent;
+    }
+
+    .practice-tab{
+      border:none;
+      background:var(--bg-soft);
+      color:var(--text);
+      padding:14px 14px;
+      border-radius:18px;
+      cursor:pointer;
+      font-weight:700;
+      font-size:14px;
+      border:1px solid var(--border);
+      box-shadow:var(--shadow-sm);
+      transition:0.22s ease;
+    }
+
+    .practice-tab.active{
+      background:linear-gradient(135deg,var(--primary),var(--secondary));
+      color:#fff;
+      border-color:transparent;
+      box-shadow:var(--shadow);
+    }
+
+    .practice-panel{
+      display:none;
+    }
+
+    .practice-panel.active{
+      display:block;
+    }
+
+    .mobile-stack{
+      display:grid;
+      gap:18px;
+    }
+
+    .practice-grid{
+      display:grid;
+      grid-template-columns:1.08fr .92fr;
+      gap:18px;
+      margin-top:6px;
+    }
+
+    .practice-card{
+      background:var(--bg-soft);
+      border:1px solid var(--border);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:22px;
+      text-align:left;
+    }
+
+    .practice-card h2{
+      font-size:24px;
+      margin-bottom:8px;
+      line-height:1.25;
+    }
+
+    .practice-card p{
+      color:var(--text-soft);
+      font-size:14px;
+      line-height:1.75;
+      margin-bottom:10px;
+    }
+
+    .practice-card-header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+    }
+
+    .practice-card-icon{
+      width:52px;
+      height:52px;
+      border-radius:16px;
+      background:linear-gradient(135deg,var(--primary),var(--secondary));
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:20px;
+      flex-shrink:0;
+      box-shadow:var(--shadow-sm);
+    }
+
+    .practice-form{
+      display:grid;
+      gap:14px;
+      margin-top:16px;
+    }
+
+    .field-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+    }
+
+    .field-wrap{
+      display:grid;
+      gap:7px;
+    }
+
+    .field-label{
+      font-size:13px;
+      font-weight:600;
+      color:var(--text-soft);
+    }
+
+    .practice-form select,
+    .practice-form textarea{
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px 15px;
+      font-family:"Poppins",sans-serif;
+      font-size:14px;
+      background:var(--bg-soft);
+      color:var(--text);
+      outline:none;
+      transition:0.2s ease;
+    }
+
+    .practice-form select:focus,
+    .practice-form textarea:focus{
+      border-color:var(--primary);
+      box-shadow:0 0 0 4px rgba(99,102,241,0.08);
+    }
+
+    .practice-form textarea{
+      min-height:140px;
+      resize:vertical;
+      line-height:1.7;
+    }
+
+    .helper-note{
+      background:var(--bg);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:14px 15px;
+      color:var(--text-soft);
+      line-height:1.75;
+      font-size:13px;
+    }
+
+    .practice-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-top:4px;
+    }
+
+    .practice-actions .card-btn,
+    .practice-actions .btn-secondary{
+      width:100%;
+    }
+
+    .status-box{
+      min-height:22px;
+      margin-top:4px;
+      font-weight:600;
+      font-size:14px;
+    }
+
+    .how-list{
+      display:grid;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    .how-item{
+      display:flex;
+      align-items:flex-start;
+      gap:12px;
+      padding:12px;
+      border-radius:16px;
+      background:var(--bg);
+      border:1px solid var(--border);
+    }
+
+    .how-item-index{
+      width:32px;
+      height:32px;
+      border-radius:10px;
+      background:linear-gradient(135deg,var(--primary),var(--secondary));
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      font-size:13px;
+      flex-shrink:0;
+    }
+
+    .how-item-text{
+      color:var(--text-soft);
+      font-size:14px;
+      line-height:1.7;
+    }
+
+    .panel-block{
+      margin-top:18px;
+    }
+
+    .paper-meta{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+      gap:10px;
+      margin-bottom:18px;
+    }
+
+    .meta-chip{
+      background:#eef2ff;
+      border-radius:14px;
+      padding:11px 12px;
+      color:#4338ca;
+      font-weight:700;
+      font-size:13px;
+      line-height:1.45;
+      word-break:break-word;
+    }
+
+    .question-list{
+      display:grid;
+      gap:14px;
+      margin-top:18px;
+    }
+
+    .question-card{
+      background:var(--bg-soft);
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:16px;
+      box-shadow:var(--shadow-sm);
+      text-align:left;
+    }
+
+    .question-card h4{
+      margin-bottom:10px;
+      font-size:16px;
+      line-height:1.75;
+      color:var(--text);
+    }
+
+    .question-meta{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+
+    .small-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      background:var(--bg);
+      padding:7px 11px;
+      border-radius:999px;
+      font-size:11px;
+      color:var(--text-soft);
+      font-weight:700;
+      border:1px solid var(--border);
+    }
+
+    .options-list{
+      display:grid;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    .option-item{
+      display:block;
+      width:100%;
+      border:1px solid #dbe1ea;
+      border-radius:18px;
+      background:var(--bg-soft);
+      cursor:pointer;
+      transition:0.22s ease;
+      overflow:hidden;
+    }
+
+    .option-item:hover{
+      border-color:#a5b4fc;
+      transform:translateY(-1px);
+      box-shadow:0 10px 24px rgba(99,102,241,.08);
+    }
+
+    .option-item.selected{
+      border-color:#6366f1;
+      background:#eef2ff;
+      box-shadow:0 10px 24px rgba(99,102,241,.10);
+    }
+
+    .option-item input{
+      display:none;
+    }
+
+    .option-content{
+      display:grid;
+      grid-template-columns:48px 1fr;
+      align-items:flex-start;
+      gap:12px;
+      padding:14px;
+    }
+
+    .option-prefix{
+      width:38px;
+      height:38px;
+      border-radius:12px;
+      background:#f3f4f6;
+      color:#1f2937;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      font-size:15px;
+      line-height:1;
+      transition:0.22s ease;
+      flex-shrink:0;
+    }
+
+    .option-item.selected .option-prefix{
+      background:#4f46e5;
+      color:#fff;
+    }
+
+    .option-text{
+      color:var(--text);
+      font-size:14px;
+      line-height:1.75;
+      word-break:break-word;
+      padding-top:3px;
+    }
+
+    .submit-box{
+      margin-top:20px;
+      text-align:center;
+    }
+
+    .submit-box .card-btn{
+      width:100%;
+      max-width:320px;
+    }
+
+    .result-summary{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+      gap:12px;
+      margin-top:18px;
+    }
+
+    .result-tile{
+      background:var(--bg-soft);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:16px;
+      box-shadow:var(--shadow-sm);
+      text-align:center;
+    }
+
+    .result-tile h3{
+      font-size:24px;
+      color:var(--primary);
+      margin-bottom:4px;
+      line-height:1.1;
+    }
+
+    .result-tile p{
+      margin:0;
+      font-size:12px;
+      color:var(--text-soft);
+    }
+
+    .review-list{
+      display:grid;
+      gap:14px;
+      margin-top:18px;
+    }
+
+    .review-card{
+      background:var(--bg-soft);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:15px;
+      box-shadow:var(--shadow-sm);
+      text-align:left;
+    }
+
+    .review-options{
+      margin-top:12px;
+      display:grid;
+      gap:8px;
+    }
+
+    .review-option{
+      padding:10px 12px;
+      border-radius:12px;
+      background:var(--bg);
+      border:1px solid var(--border);
+      line-height:1.7;
+      font-size:14px;
+      color:var(--text);
+    }
+
+    .review-extra{
+      display:grid;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .review-note{
+      padding:12px 14px;
+      border-radius:14px;
+      line-height:1.75;
+      font-size:13px;
+    }
+
+    .review-note.correct{
+      background:#ecfdf5;
+      border:1px solid #a7f3d0;
+      color:#065f46;
+    }
+
+    .review-note.trap{
+      background:#fff7ed;
+      border:1px solid #fdba74;
+      color:#9a3412;
+    }
+
+    .answer-good{
+      color:#059669;
+      font-weight:700;
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    .answer-bad{
+      color:#dc2626;
+      font-weight:700;
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    .answer-neutral{
+      color:#6b7280;
+      font-weight:700;
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    .chart-grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:18px;
+      margin-top:4px;
+    }
+
+    .chart-card canvas{
+      width:100% !important;
+      max-width:100%;
+    }
+
+    .scorecards-wrap{
+      display:grid;
+      gap:14px;
+      margin-top:18px;
+    }
+
+    .scorecard-item{
+      background:var(--bg-soft);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:16px;
+      box-shadow:var(--shadow-sm);
+      text-align:left;
+    }
+
+    .scorecard-top{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:8px;
+    }
+
+    .scorecard-meta{
+      color:var(--text-soft);
+      font-size:13px;
+      line-height:1.8;
+    }
+
+    .subject-breakdown{
+      display:grid;
+      gap:8px;
+      margin-top:10px;
+    }
+
+    .subject-pill{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      background:var(--bg);
+      border-radius:12px;
+      padding:10px 12px;
+      color:var(--text-soft);
+      font-size:13px;
+      border:1px solid var(--border);
+      line-height:1.7;
+    }
+
+    .doubt-grid{
+      display:grid;
+      grid-template-columns:.95fr 1.05fr;
+      gap:18px;
+      margin-top:6px;
+    }
+
+    .chat-window{
+      display:grid;
+      gap:12px;
+      margin-top:18px;
+      max-height:720px;
+      overflow:auto;
+      padding-right:2px;
+    }
+
+    .chat-bubble{
+      background:var(--bg-soft);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      box-shadow:var(--shadow-sm);
+      text-align:left;
+      white-space:pre-wrap;
+      line-height:1.8;
+      font-size:14px;
+      word-break:break-word;
+    }
+
+    .chat-user{
+      border-left:6px solid #4f46e5;
+    }
+
+    .chat-ai{
+      border-left:6px solid #10b981;
+    }
+
+    .empty-state{
+      background:var(--bg-soft);
+      border:1px dashed var(--border-strong);
+      border-radius:22px;
+      padding:22px;
+      text-align:center;
+      color:var(--text-soft);
+      line-height:1.8;
+      box-shadow:var(--shadow-sm);
+    }
+
+    @media(max-width:1100px){
+      .practice-hero-grid,
+      .practice-grid,
+      .doubt-grid{
+        grid-template-columns:1fr;
+      }
+
+      .practice-tabs{
+        top:82px;
+      }
+    }
+
+    @media(max-width:820px){
+      .practice-hero-points{
+        grid-template-columns:1fr;
+      }
+
+      .field-grid{
+        grid-template-columns:1fr;
+      }
+
+      .practice-actions{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media(max-width:640px){
+      .practice-page{
+        width:calc(100% - 12px);
+        margin:14px auto 60px;
+      }
+
+      .practice-hero{
+        border-radius:24px;
+        padding:18px 14px 16px;
+      }
+
+      .practice-tabs{
+        grid-template-columns:1fr;
+        top:76px;
+      }
+
+      .practice-tab{
+        padding:13px 12px;
+        border-radius:16px;
+      }
+
+      .practice-card{
+        padding:16px;
+        border-radius:20px;
+      }
+
+      .practice-card h2{
+        font-size:20px;
+      }
+
+      .practice-card-header{
+        align-items:center;
+      }
+
+      .practice-card-icon{
+        width:44px;
+        height:44px;
+        border-radius:14px;
+        font-size:18px;
+      }
+
+      .preview-stat-grid{
+        grid-template-columns:1fr 1fr 1fr;
+      }
+
+      .question-card h4{
+        font-size:15px;
+      }
+
+      .option-content{
+        grid-template-columns:42px 1fr;
+        gap:10px;
+        padding:12px;
+      }
+
+      .option-prefix{
+        width:32px;
+        height:32px;
+        border-radius:10px;
+        font-size:13px;
+      }
+
+      .option-text{
+        font-size:13px;
+      }
+
+      .result-summary{
+        grid-template-columns:1fr 1fr;
+      }
+
+      .meta-chip,
+      .subject-pill,
+      .review-option{
+        font-size:12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="navbar">
+    <div class="logo">
+      <div class="logo-mark">E</div>
+      <a href="index.html">ExamAI</a>
+    </div>
+
+    <div class="desktop-nav">
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="universities.html">Universities</a></li>
+        <li><a href="boards.html">Boards</a></li>
+        <li><a href="predictor.html">Predictor</a></li>
+        <li><a href="jee-neet.html">JEE / NEET</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="#practicePanel" class="btn">Start Solving</a>
+      </div>
+    </div>
+
+    <button id="menuToggle" class="menu-toggle" aria-label="Open menu">☰</button>
+  </header>
+
+  <main class="practice-page">
+    <section class="practice-hero">
+      <div class="practice-hero-grid">
+        <div>
+          <div class="practice-kicker">
+            <span>●</span>
+            Mobile-first competitive practice
+          </div>
+
+          <h1>
+            Prepare smarter for <span>JEE & NEET</span> with one focused practice suite
+          </h1>
+
+          <p>
+            Generate exam-style papers, submit them for instant scoring, review explanations, track
+            your growth, and solve doubts with AI — all inside one responsive experience.
+          </p>
+
+          <div class="practice-hero-points">
+            <div class="practice-hero-point">
+              <strong>Generate</strong>
+              <span>Choose exam type, question count, difficulty, and topics.</span>
+            </div>
+            <div class="practice-hero-point">
+              <strong>Solve</strong>
+              <span>Answer questions with a cleaner mobile-friendly option layout.</span>
+            </div>
+            <div class="practice-hero-point">
+              <strong>Analyze</strong>
+              <span>See marks, subject breakdown, score history, and AI doubt support.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="practice-side-preview">
+          <div class="preview-card">
+            <div class="preview-card-top">
+              <div class="preview-card-title">Latest Attempt Preview</div>
+              <div class="preview-pill">Score UI</div>
+            </div>
+
+            <div class="preview-stat-grid">
+              <div class="preview-stat">
+                <strong>72%</strong>
+                <span>Performance</span>
+              </div>
+              <div class="preview-stat">
+                <strong>30</strong>
+                <span>Questions</span>
+              </div>
+              <div class="preview-stat">
+                <strong>+18</strong>
+                <span>Growth</span>
+              </div>
+            </div>
+
+            <div class="preview-bars">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+
+          
+        </div>
+      </div>
+    </section>
+
+    <section class="practice-sections">
+      <div class="practice-tabs">
+        <button class="practice-tab active" data-tab="practicePanel">Competitive PYQs</button>
+        <button class="practice-tab" data-tab="scorePanel">Score Analysis</button>
+        <button class="practice-tab" data-tab="doubtPanel">AI Doubt Solver</button>
+      </div>
+
+      <div id="practicePanel" class="practice-panel active">
+        <div class="mobile-stack">
+          <div class="practice-grid">
+            <div class="practice-card">
+              <div class="practice-card-header">
+                <div>
+                  <h2>Generate Practice Paper</h2>
+                  <p>Generate JEE / NEET style papers without changing your existing backend logic.</p>
+                </div>
+                <div class="practice-card-icon">
+                  <i class="fa-solid fa-file-lines"></i>
+                </div>
+              </div>
+
+              <div class="practice-form">
+                <div class="field-grid">
+                  <div class="field-wrap">
+                    <label class="field-label" for="examType">Exam Type</label>
+                    <select id="examType">
+                      <option value="jee">JEE Main Style</option>
+                      <option value="neet">NEET Style</option>
+                    </select>
+                  </div>
+
+                  <div class="field-wrap">
+                    <label class="field-label" for="countMode">Question Count</label>
+                    <select id="countMode">
+                      <option value="15">Generate 15 Questions</option>
+                      <option value="30">Generate 30 Questions</option>
+                      <option value="45">Generate 45 Questions</option>
+                      <option value="full">Generate Full Question Paper</option>
+                    </select>
+                  </div>
+
+                  <div class="field-wrap">
+                    <label class="field-label" for="difficultyMode">Difficulty</label>
+                    <select id="difficultyMode">
+                      <option value="moderate">Moderate Mode</option>
+                      <option value="hard">Hard Mode</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="field-wrap">
+                  <label class="field-label" for="topicsInput">Topics</label>
+                  <textarea id="topicsInput" placeholder="Enter one or more topics. Example:
+Photosynthesis, Human respiration, Thermodynamics, Organic reaction mechanism"></textarea>
+                </div>
+
+                <div class="helper-note">
+                  <strong>Moderate Mode:</strong> Real exam-like and concept-based with balanced difficulty.<br>
+                  <strong>Hard Mode:</strong> Tougher options, closer traps, and stronger multi-concept pressure.
+                </div>
+
+                <div class="practice-actions">
+                  <button class="card-btn" id="generatePaperBtn" type="button">Generate Paper</button>
+                  <button class="btn-secondary" id="clearPaperBtn" type="button">Clear</button>
+                </div>
+
+                <div id="paperStatus" class="status-box"></div>
+              </div>
+            </div>
+
+            <div class="practice-card">
+              <div class="practice-card-header">
+                <div>
+                  <h2>How It Works</h2>
+                  <p>read the instrection carefully.</p>
+                </div>
+                <div class="practice-card-icon">
+                  <i class="fa-solid fa-lightbulb"></i>
+                </div>
+              </div>
+
+              <div class="how-list">
+                <div class="how-item">
+                  <div class="how-item-index">1</div>
+                  <div class="how-item-text">Select JEE or NEET depending on your practice target.</div>
+                </div>
+                <div class="how-item">
+                  <div class="how-item-index">2</div>
+                  <div class="how-item-text">Choose 15, 30, 45, or full paper mode.</div>
+                </div>
+                <div class="how-item">
+                  <div class="how-item-index">3</div>
+                  <div class="how-item-text">Add one or multiple topics and choose difficulty mode.</div>
+                </div>
+                <div class="how-item">
+                  <div class="how-item-index">4</div>
+                  <div class="how-item-text">Generate, solve, submit, and get result summary with review.</div>
+                </div>
+                <div class="how-item">
+                  <div class="how-item-index">5</div>
+                  <div class="how-item-text">Use Score Analysis and AI Doubt Solver for deeper preparation.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="paperArea" class="panel-block">
+            <div class="empty-state">
+              Your generated paper will appear here. This section is now optimized for smaller screens, larger tap targets, and easier reading.
+            </div>
+          </div>
+
+          <div id="resultArea" class="panel-block"></div>
+        </div>
+      </div>
+
+      <div id="scorePanel" class="practice-panel">
+        <div class="mobile-stack">
+          <div class="chart-grid">
+            <div class="practice-card chart-card">
+              <div class="practice-card-header">
+                <div>
+                  <h2>Growth Trend</h2>
+                  <p>Track how your performance changes across attempts.</p>
+                </div>
+                <div class="practice-card-icon">
+                  <i class="fa-solid fa-chart-line"></i>
+                </div>
+              </div>
+              <canvas id="scoreTrendChart" height="140"></canvas>
+            </div>
+
+            <div class="practice-card chart-card">
+              <div class="practice-card-header">
+                <div>
+                  <h2>Latest Attempt Breakdown</h2>
+                  <p>Quick correct, incorrect, and unattempted split.</p>
+                </div>
+                <div class="practice-card-icon">
+                  <i class="fa-solid fa-chart-pie"></i>
+                </div>
+              </div>
+              <canvas id="scorePieChart" height="140"></canvas>
+            </div>
+          </div>
+
+          <div class="practice-card">
+            <div class="practice-card-header">
+              <div>
+                <h2>Saved Score Analysis</h2>
+                <p>Your saved practice attempts will appear below.</p>
+              </div>
+              <div class="practice-card-icon">
+                <i class="fa-solid fa-database"></i>
+              </div>
+            </div>
+
+            <div id="scorecardsList" class="scorecards-wrap">
+              <div class="empty-state">Loading score analysis...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="doubtPanel" class="practice-panel">
+        <div class="doubt-grid">
+          <div class="practice-card">
+            <div class="practice-card-header">
+              <div>
+                <h2>AI Doubt Solver</h2>
+                <p>Paste a question or concept doubt. The response stays exam-focused.</p>
+              </div>
+              <div class="practice-card-icon">
+                <i class="fa-solid fa-robot"></i>
+              </div>
+            </div>
+
+            <div class="practice-form">
+              <div class="field-wrap">
+                <label class="field-label" for="doubtExamType">Exam Type</label>
+                <select id="doubtExamType">
+                  <option value="jee">JEE Main Style</option>
+                  <option value="neet">NEET Style</option>
+                </select>
+              </div>
+
+              <div class="field-wrap">
+                <label class="field-label" for="doubtInput">Your Doubt</label>
+                <textarea id="doubtInput" placeholder="Paste your question or doubt here..."></textarea>
+              </div>
+
+              <div class="practice-actions">
+                <button class="card-btn" id="askDoubtBtn" type="button">Ask AI</button>
+                <button class="btn-secondary" id="clearDoubtBtn" type="button">Clear</button>
+              </div>
+
+              <div id="doubtStatus" class="status-box"></div>
+            </div>
+          </div>
+
+          <div class="practice-card">
+            <div class="practice-card-header">
+              <div>
+                <h2>Conversation</h2>
+                <p>Your doubt and AI replies will appear here in a cleaner chat layout.</p>
+              </div>
+              <div class="practice-card-icon">
+                <i class="fa-solid fa-comments"></i>
+              </div>
+            </div>
+
+            <div id="doubtChat" class="chat-window">
+              <div class="empty-state">
+                Ask your first doubt to start the conversation.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-shell">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <h3>ExamAI</h3>
+          <p>AI Powered Exam Preparation Platform for JEE, NEET, boards, and university students.</p>
+          <div class="made-by">WebApp made by <strong>Jay (Mrityunjay Gautam)</strong></div>
+        </div>
+
+        <div class="footer-group">
+          <h4>Quick Links</h4>
+          <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="universities.html">Universities</a>
+            <a href="boards.html">Boards</a>
+            <a href="predictor.html">Question Predictor</a>
+            <a href="jee-neet.html">JEE / NEET Practice</a>
+          </div>
+        </div>
+
+        <div class="footer-group">
+          <h4>Connect</h4>
+          <div class="social-row">
+            <a class="social-link" href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+              <i class="fa-brands fa-linkedin-in"></i>
+            </a>
+            <a class="social-link" href="https://github.com/" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+              <i class="fa-brands fa-github"></i>
+            </a>
+            <a class="social-link" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <i class="fa-brands fa-instagram"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 ExamAI. All rights reserved.</span>
+        
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/jeeNeet.js"></script>
+</body>
+</html>

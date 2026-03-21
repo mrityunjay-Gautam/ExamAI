@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Question Predictor | ExamAI</title>
+  <meta name="description" content="Predict important exam questions and solve doubts using ExamAI AI tools.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    .predictor-page {
+      width: min(var(--container), calc(100% - 14px));
+      margin: 18px auto 80px;
+    }
+
+    .predictor-hero {
+      background:
+        radial-gradient(circle at top left, rgba(91, 92, 226, 0.12), transparent 24%),
+        linear-gradient(135deg, #f9fbff 0%, #eef2ff 50%, #ede9fe 100%);
+      border: 1px solid rgba(91, 92, 226, 0.10);
+      border-radius: 30px;
+      box-shadow: var(--shadow-lg);
+      padding: 26px 18px 22px;
+      overflow: hidden;
+    }
+
+    body.dark-mode .predictor-hero {
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.05), transparent 24%),
+        linear-gradient(135deg, #111827 0%, #182235 50%, #1a1930 100%);
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+
+    .predictor-hero-grid {
+      display: grid;
+      grid-template-columns: 1.08fr .92fr;
+      gap: 22px;
+      align-items: center;
+    }
+
+    .predictor-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(91, 92, 226, 0.10);
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+
+    .predictor-hero h1 {
+      font-size: clamp(30px, 5vw, 54px);
+      line-height: 1.12;
+      margin-bottom: 12px;
+      letter-spacing: -0.8px;
+    }
+
+    .predictor-hero h1 span {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .predictor-hero p {
+      color: var(--text-soft);
+      font-size: 15px;
+      line-height: 1.8;
+      margin-bottom: 18px;
+      max-width: 760px;
+    }
+
+    .predictor-points {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .predictor-point {
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    body.dark-mode .predictor-point {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+
+    .predictor-point strong {
+      display: block;
+      font-size: 17px;
+      margin-bottom: 4px;
+    }
+
+    .predictor-point span {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text-soft);
+    }
+
+    .predictor-preview-wrap {
+      display: grid;
+      gap: 14px;
+    }
+
+    .predictor-preview-card {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .predictor-preview-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .predictor-preview-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .predictor-preview-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .predictor-mini-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .predictor-mini-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .predictor-mini-item strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+
+    .predictor-mini-item span {
+      color: var(--text-soft);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .predictor-layout {
+      display: grid;
+      grid-template-columns: .92fr 1.08fr;
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .predictor-card-ui {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+      text-align: left;
+    }
+
+    .predictor-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .predictor-card-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .predictor-card-ui h2 {
+      font-size: 24px;
+      margin-bottom: 8px;
+      line-height: 1.25;
+    }
+
+    .predictor-card-ui p {
+      color: var(--text-soft);
+      font-size: 14px;
+      line-height: 1.75;
+      margin-bottom: 10px;
+    }
+
+    .tool-grid {
+      display: grid;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .tool-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .tool-card-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .tool-card h3 {
+      font-size: 17px;
+      margin-bottom: 4px;
+    }
+
+    .tool-card p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .tool-link {
+      margin-top: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .predictor-form {
+      display: grid;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .field-wrap {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-soft);
+    }
+
+    .predictor-form textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 15px;
+      font-family: "Poppins", sans-serif;
+      font-size: 14px;
+      background: var(--bg-soft);
+      color: var(--text);
+      outline: none;
+      transition: 0.2s ease;
+      min-height: 210px;
+      resize: vertical;
+      line-height: 1.8;
+      margin-top: 0;
+    }
+
+    .predictor-form textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08);
+    }
+
+    .helper-note {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px 15px;
+      color: var(--text-soft);
+      line-height: 1.75;
+      font-size: 13px;
+    }
+
+    .predictor-actions-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .predictor-actions-row .card-btn,
+    .predictor-actions-row .btn-secondary {
+      width: 100%;
+      min-height: 50px;
+      border-radius: 16px;
+      padding: 12px 14px;
+      text-align: center;
+    }
+
+    .status-text {
+      min-height: 22px;
+      margin-top: 4px;
+      font-weight: 600;
+      font-size: 14px;
+      text-align: left;
+    }
+
+    .result-zone {
+      margin-top: 22px;
+    }
+
+    .result-header-card {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .result-header-card h2 {
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .result-header-card p {
+      color: var(--text-soft);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 0;
+    }
+
+    .result-card {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: var(--shadow-sm);
+      text-align: left;
+      transition: 0.22s ease;
+    }
+
+    .result-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow);
+    }
+
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .result-card h3 {
+      font-size: 18px;
+      line-height: 1.7;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .result-card p {
+      font-size: 13px;
+      margin-bottom: 10px;
+      color: var(--text-soft);
+      line-height: 1.8;
+    }
+
+    .result-card p strong {
+      color: var(--text);
+    }
+
+    .result-card ul {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .result-card li {
+      font-size: 13px;
+      color: var(--text-soft);
+      line-height: 1.7;
+    }
+
+    .empty-state {
+      background: var(--bg-soft);
+      border: 1px dashed var(--border-strong);
+      border-radius: 22px;
+      padding: 22px;
+      text-align: center;
+      color: var(--text-soft);
+      line-height: 1.8;
+      box-shadow: var(--shadow-sm);
+    }
+
+    @media(max-width:1100px) {
+      .predictor-hero-grid,
+      .predictor-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media(max-width:820px) {
+      .predictor-points {
+        grid-template-columns: 1fr;
+      }
+
+      .predictor-actions-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media(max-width:640px) {
+      .predictor-page {
+        width: calc(100% - 12px);
+        margin: 14px auto 60px;
+      }
+
+      .predictor-hero {
+        border-radius: 24px;
+        padding: 18px 14px 16px;
+      }
+
+      .predictor-card-ui {
+        padding: 16px;
+        border-radius: 20px;
+      }
+
+      .predictor-card-ui h2,
+      .result-header-card h2 {
+        font-size: 20px;
+      }
+
+      .predictor-card-header {
+        align-items: center;
+      }
+
+      .predictor-card-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        font-size: 18px;
+      }
+
+      .result-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .result-card h3 {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="navbar">
+    <div class="logo">
+      <div class="logo-mark">E</div>
+      <a href="index.html">ExamAI</a>
+    </div>
+
+    <div class="desktop-nav">
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="universities.html">Universities</a></li>
+        <li><a href="boards.html">Boards</a></li>
+        <li><a href="predictor.html">Predictor</a></li>
+        <li><a href="jee-neet.html">JEE / NEET</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="#questionPredictorBox" class="btn">Use Predictor</a>
+      </div>
+    </div>
+
+    <button id="menuToggle" class="menu-toggle" aria-label="Open menu">☰</button>
+  </header>
+
+  <main class="predictor-page">
+    <section class="predictor-hero">
+      <div class="predictor-hero-grid">
+        <div>
+          <div class="predictor-kicker">
+            <span>●</span>
+            AI-powered prediction workflow
+          </div>
+
+          <h1>
+            Predict your most important <span>exam questions</span> with a cleaner UI
+          </h1>
+
+          <p>
+            Paste your syllabus questions or topics, let ExamAI rank the most important ones,
+            and review the output in a clearer card layout.
+          </p>
+
+          <div class="predictor-points">
+            <div class="predictor-point">
+              <strong>Paste</strong>
+              <span>Add raw questions, topics, or likely syllabus areas.</span>
+            </div>
+            <div class="predictor-point">
+              <strong>Predict</strong>
+              <span>Generate ranked top 10, 20, or 30 important questions.</span>
+            </div>
+            <div class="predictor-point">
+              <strong>Revise</strong>
+              <span>Use reasons, explanation, and key points for focused preparation.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="predictor-preview-wrap">
+          <div class="predictor-preview-card">
+            <div class="predictor-preview-top">
+              <div class="predictor-preview-title">Prediction Preview</div>
+              <div class="predictor-preview-pill">Ranked Output</div>
+            </div>
+
+            <div class="predictor-mini-list">
+              <div class="predictor-mini-item">
+                <strong>Rank 1</strong>
+                <span>High-repeat concept with broad syllabus coverage.</span>
+              </div>
+              <div class="predictor-mini-item">
+                <strong>Rank 2</strong>
+                <span>Frequently asked theory topic with direct exam relevance.</span>
+              </div>
+              <div class="predictor-mini-item">
+                <strong>Rank 3</strong>
+                <span>Important conceptual question with strong scoring chance.</span>
+              </div>
+            </div>
+          </div>
+
+          
+        </div>
+      </div>
+    </section>
+
+    <section class="predictor-layout">
+      <div class="predictor-card-ui">
+        <div class="predictor-card-header">
+          <div>
+            <h2>AI Exam Tools</h2>
+            <p>
+              This section keeps your current tool flow the same, but presents it in a much more structured way.
+            </p>
+          </div>
+          <div class="predictor-card-icon">
+            <i class="fa-solid fa-sparkles"></i>
+          </div>
+        </div>
+
+        <div class="tool-grid">
+          <div class="tool-card">
+            <div class="tool-card-icon">
+              <i class="fa-solid fa-ranking-star"></i>
+            </div>
+            <div>
+              <h3>Question Predictor</h3>
+              <p>
+                Paste syllabus-based input and let AI rank the most important questions with explanation and key points.
+              </p>
+              <a href="#questionPredictorBox" class="tool-link">Open predictor <span>→</span></a>
+            </div>
+          </div>
+
+          <div class="tool-card">
+            <div class="tool-card-icon">
+              <i class="fa-solid fa-robot"></i>
+            </div>
+            <div>
+              <h3>AI Doubt Solver</h3>
+              <p>
+                Ask academic doubts separately and get concept explanation, structured help, and faster clarity.
+              </p>
+              <a href="doubt-solver.html" class="tool-link">Open doubt solver <span>→</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="questionPredictorBox" class="predictor-card-ui">
+        <div class="predictor-card-header">
+          <div>
+            <h2>AI Question Predictor</h2>
+            <p>
+              Paste your important topics or questions below. ExamAI will predict the top questions most likely to matter in exams.
+            </p>
+          </div>
+          <div class="predictor-card-icon">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </div>
+        </div>
+
+        <div class="predictor-form">
+          <div class="field-wrap">
+            <label class="field-label" for="questionsInput">Questions / Topics Input</label>
+            <textarea id="questionsInput" placeholder="Example:
+1. Define Operating System
+2. Explain Deadlock
+3. Define Machine Learning
+4. Explain DBMS architecture
+5. What is normalization?
+6. Explain CPU scheduling
+7. What is polymorphism?
+8. Explain software testing"></textarea>
+          </div>
+
+          <div class="helper-note">
+            Add one topic or question per line for better results. You can paste unit-wise topics, expected questions,
+            revision points, or raw syllabus items.
+          </div>
+
+          <div class="predictor-actions-row">
+            <button class="card-btn" type="button" onclick="predictQuestions(10)">Top 10 Questions</button>
+            <button class="card-btn" type="button" onclick="predictQuestions(20)">Top 20 Questions</button>
+            <button class="card-btn" type="button" onclick="predictQuestions(30)">Top 30 Questions</button>
+          </div>
+
+          <p id="predictorStatus" class="status-text"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="result-zone">
+      <div class="result-header-card">
+        <h2>Prediction Results</h2>
+        <p>
+          Ranked results will appear below in clean mobile-friendly cards. Your existing JavaScript rendering still works here.
+        </p>
+      </div>
+
+      <div id="resultsContainer" class="result-grid">
+        <div class="empty-state">
+          No prediction yet. Paste your questions above and generate top-ranked important questions.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-shell">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <h3>ExamAI</h3>
+          <p>AI Powered Exam Preparation Platform for JEE, NEET, boards, and university students.</p>
+          <div class="made-by">WebApp made by <strong>Jay (Mrityunjay Gautam)</strong></div>
+        </div>
+
+        <div class="footer-group">
+          <h4>Quick Links</h4>
+          <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="universities.html">Universities</a>
+            <a href="boards.html">Boards</a>
+            <a href="predictor.html">Question Predictor</a>
+            <a href="jee-neet.html">JEE / NEET Practice</a>
+          </div>
+        </div>
+
+        <div class="footer-group">
+          <h4>Connect</h4>
+          <div class="social-row">
+            <a class="social-link" href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+              <i class="fa-brands fa-linkedin-in"></i>
+            </a>
+            <a class="social-link" href="https://github.com/" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+              <i class="fa-brands fa-github"></i>
+            </a>
+            <a class="social-link" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <i class="fa-brands fa-instagram"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 ExamAI. All rights reserved.</span>
+        
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/predictor.js"></script>
+</body>
+
+</html>

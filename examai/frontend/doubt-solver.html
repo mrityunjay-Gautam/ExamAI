@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Doubt Solver | ExamAI</title>
+  <meta name="description" content="Ask academic doubts and get instant AI explanations on ExamAI.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    .doubt-page {
+      width: min(var(--container), calc(100% - 14px));
+      margin: 18px auto 80px;
+    }
+
+    .doubt-hero {
+      background:
+        radial-gradient(circle at top left, rgba(91, 92, 226, 0.12), transparent 24%),
+        linear-gradient(135deg, #f9fbff 0%, #eef2ff 50%, #ede9fe 100%);
+      border: 1px solid rgba(91, 92, 226, 0.10);
+      border-radius: 30px;
+      box-shadow: var(--shadow-lg);
+      padding: 26px 18px 22px;
+      overflow: hidden;
+    }
+
+    body.dark-mode .doubt-hero {
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.05), transparent 24%),
+        linear-gradient(135deg, #111827 0%, #182235 50%, #1a1930 100%);
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+
+    .doubt-hero-grid {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 22px;
+      align-items: center;
+    }
+
+    .doubt-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(91, 92, 226, 0.10);
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+
+    .doubt-hero h1 {
+      font-size: clamp(30px, 5vw, 54px);
+      line-height: 1.12;
+      margin-bottom: 12px;
+      letter-spacing: -0.8px;
+    }
+
+    .doubt-hero h1 span {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .doubt-hero p {
+      color: var(--text-soft);
+      font-size: 15px;
+      line-height: 1.8;
+      margin-bottom: 18px;
+      max-width: 760px;
+    }
+
+    .doubt-points {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .doubt-point {
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    body.dark-mode .doubt-point {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+
+    .doubt-point strong {
+      display: block;
+      font-size: 17px;
+      margin-bottom: 4px;
+    }
+
+    .doubt-point span {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text-soft);
+    }
+
+    .doubt-preview-wrap {
+      display: grid;
+      gap: 14px;
+    }
+
+    .doubt-preview-card {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .doubt-preview-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .doubt-preview-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .doubt-preview-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .doubt-mini-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .doubt-mini-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .doubt-mini-item strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+
+    .doubt-mini-item span {
+      color: var(--text-soft);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .doubt-layout {
+      display: grid;
+      grid-template-columns: .95fr 1.05fr;
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .doubt-card {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+      text-align: left;
+    }
+
+    .doubt-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .doubt-card-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .doubt-card h2 {
+      font-size: 24px;
+      margin-bottom: 8px;
+      line-height: 1.25;
+    }
+
+    .doubt-card p {
+      color: var(--text-soft);
+      font-size: 14px;
+      line-height: 1.75;
+      margin-bottom: 10px;
+    }
+
+    .field-wrap {
+      display: grid;
+      gap: 7px;
+      margin-top: 14px;
+    }
+
+    .field-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-soft);
+    }
+
+    .doubt-card textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 15px;
+      font-family: "Poppins", sans-serif;
+      font-size: 14px;
+      background: var(--bg-soft);
+      color: var(--text);
+      outline: none;
+      transition: 0.2s ease;
+      min-height: 220px;
+      resize: vertical;
+      line-height: 1.8;
+      margin-top: 0;
+    }
+
+    .doubt-card textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08);
+    }
+
+    .helper-note {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px 15px;
+      color: var(--text-soft);
+      line-height: 1.75;
+      font-size: 13px;
+      margin-top: 14px;
+    }
+
+    .doubt-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .doubt-actions .card-btn,
+    .doubt-actions .btn-secondary {
+      width: 100%;
+      min-height: 50px;
+      border-radius: 16px;
+      padding: 12px 14px;
+      text-align: center;
+    }
+
+    .quick-prompts {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .quick-prompt {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px;
+      color: var(--text-soft);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .chat-shell {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+      max-height: 720px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .chat-container {
+      max-width: 100%;
+      margin: 0;
+      margin-top: 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    .message {
+      background: var(--bg-soft);
+      padding: 16px;
+      border-radius: 18px;
+      margin-bottom: 0;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      white-space: pre-wrap;
+      line-height: 1.8;
+      font-size: 14px;
+      word-break: break-word;
+    }
+
+    .user {
+      border-left: 6px solid #4f46e5;
+    }
+
+    .ai {
+      border-left: 6px solid #10b981;
+    }
+
+    .empty-state {
+      background: var(--bg-soft);
+      border: 1px dashed var(--border-strong);
+      border-radius: 22px;
+      padding: 22px;
+      text-align: center;
+      color: var(--text-soft);
+      line-height: 1.8;
+      box-shadow: var(--shadow-sm);
+    }
+
+    @media(max-width:1100px) {
+      .doubt-hero-grid,
+      .doubt-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media(max-width:820px) {
+      .doubt-points {
+        grid-template-columns: 1fr;
+      }
+
+      .doubt-actions {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media(max-width:640px) {
+      .doubt-page {
+        width: calc(100% - 12px);
+        margin: 14px auto 60px;
+      }
+
+      .doubt-hero {
+        border-radius: 24px;
+        padding: 18px 14px 16px;
+      }
+
+      .doubt-card {
+        padding: 16px;
+        border-radius: 20px;
+      }
+
+      .doubt-card h2 {
+        font-size: 20px;
+      }
+
+      .doubt-card-header {
+        align-items: center;
+      }
+
+      .doubt-card-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        font-size: 18px;
+      }
+
+      .message {
+        font-size: 13px;
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="navbar">
+    <div class="logo">
+      <div class="logo-mark">E</div>
+      <a href="index.html">ExamAI</a>
+    </div>
+
+    <div class="desktop-nav">
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="universities.html">Universities</a></li>
+        <li><a href="boards.html">Boards</a></li>
+        <li><a href="predictor.html">Predictor</a></li>
+        <li><a href="jee-neet.html">JEE / NEET</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="#questionInput" class="btn">Ask Doubt</a>
+      </div>
+    </div>
+
+    <button id="menuToggle" class="menu-toggle" aria-label="Open menu">☰</button>
+  </header>
+
+  <main class="doubt-page">
+    <section class="doubt-hero">
+      <div class="doubt-hero-grid">
+        <div>
+          <div class="doubt-kicker">
+            <span>●</span>
+            Instant academic doubt help
+          </div>
+
+          <h1>
+            Solve your study doubts with <span>AI guidance</span> in a cleaner mobile-first chat UI
+          </h1>
+
+          <p>
+            Ask any academic question and get instant explanation. This redesign keeps your current
+            AI doubt flow exactly the same, while making the experience look much more professional on phones.
+          </p>
+
+          <div class="doubt-points">
+            <div class="doubt-point">
+              <strong>Ask</strong>
+              <span>Paste any topic, concept, or full academic question.</span>
+            </div>
+            <div class="doubt-point">
+              <strong>Understand</strong>
+              <span>Read cleaner AI explanations in a better chat-style layout.</span>
+            </div>
+            <div class="doubt-point">
+              <strong>Revise</strong>
+              <span>Use the answer for concept clarity and faster exam preparation.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="doubt-preview-wrap">
+          <div class="doubt-preview-card">
+            <div class="doubt-preview-top">
+              <div class="doubt-preview-title">Conversation Preview</div>
+              <div class="doubt-preview-pill">AI Support</div>
+            </div>
+
+            <div class="doubt-mini-list">
+              <div class="doubt-mini-item">
+                <strong>You ask</strong>
+                <span>Paste your question in plain text.</span>
+              </div>
+              <div class="doubt-mini-item">
+                <strong>AI replies</strong>
+                <span>Get explanation instantly in a cleaner readable format.</span>
+              </div>
+              <div class="doubt-mini-item">
+                <strong>Use anywhere</strong>
+                <span>Built with better spacing and tap-friendly controls for mobile.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="doubt-preview-card">
+            <div class="doubt-preview-top">
+              <div class="doubt-preview-title">Why this redesign?</div>
+              <div class="doubt-preview-pill">Mobile Friendly</div>
+            </div>
+            <p style="margin:0;color:var(--text-soft);font-size:13px;line-height:1.8;">
+              Better chat cards, stronger spacing, easier reading, and cleaner input flow without changing your doubt solver workability.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="doubt-layout">
+      <div class="doubt-card">
+        <div class="doubt-card-header">
+          <div>
+            <h2>Ask Your Doubt</h2>
+            <p>Type any academic doubt below and send it directly to your existing AI doubt solver logic.</p>
+          </div>
+          <div class="doubt-card-icon">
+            <i class="fa-solid fa-circle-question"></i>
+          </div>
+        </div>
+
+        <div class="field-wrap">
+          <label class="field-label" for="questionInput">Your Question</label>
+          <textarea id="questionInput" placeholder="Example:
+Explain deadlock in operating system.
+What is the difference between mitosis and meiosis?
+How does current flow in a series circuit?"></textarea>
+        </div>
+
+        <div class="helper-note">
+          Write your doubt clearly for better answers. You can paste theory doubts, concept confusion, definitions, or full exam questions.
+        </div>
+
+        <div class="doubt-actions">
+          <button class="card-btn" onclick="askAI()">Ask AI</button>
+          <button class="btn-secondary" type="button" onclick="document.getElementById('questionInput').value=''">Clear</button>
+        </div>
+
+        <div class="quick-prompts">
+          <div class="quick-prompt">Try concept-based doubts instead of one-word prompts for better explanations.</div>
+          <div class="quick-prompt">You can ask school, board, university, JEE, or NEET level conceptual questions here.</div>
+          <div class="quick-prompt">The chat on the right updates using your same existing JavaScript logic.</div>
+        </div>
+      </div>
+
+      <div class="doubt-card">
+        <div class="doubt-card-header">
+          <div>
+            <h2>AI Conversation</h2>
+            <p>Your chat will appear here in a cleaner conversation layout designed for mobile reading.</p>
+          </div>
+          <div class="doubt-card-icon">
+            <i class="fa-solid fa-comments"></i>
+          </div>
+        </div>
+
+        <div class="chat-shell">
+          <div id="chatBox" class="chat-container">
+            <div class="empty-state">
+              Ask your first doubt to start the conversation.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-shell">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <h3>ExamAI</h3>
+          <p>AI Powered Exam Preparation Platform for JEE, NEET, boards, and university students.</p>
+          <div class="made-by">WebApp made by <strong>Jay (Mrityunjay Gautam)</strong></div>
+        </div>
+
+        <div class="footer-group">
+          <h4>Quick Links</h4>
+          <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="universities.html">Universities</a>
+            <a href="boards.html">Boards</a>
+            <a href="predictor.html">Question Predictor</a>
+            <a href="jee-neet.html">JEE / NEET Practice</a>
+          </div>
+        </div>
+
+        <div class="footer-group">
+          <h4>Connect</h4>
+          <div class="social-row">
+            <a class="social-link" href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+              <i class="fa-brands fa-linkedin-in"></i>
+            </a>
+            <a class="social-link" href="https://github.com/" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+              <i class="fa-brands fa-github"></i>
+            </a>
+            <a class="social-link" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <i class="fa-brands fa-instagram"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 ExamAI. All rights reserved.</span>
+        <span>Mobile-first UI improvement without changing doubt solver workability.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/doubtSolver.js"></script>
+</body>
+
+</html>

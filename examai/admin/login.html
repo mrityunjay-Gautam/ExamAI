@@ -1,0 +1,56 @@
+<h1>Admin Login</h1>
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<title>Admin Login | ExamAI</title>
+
+<link rel="stylesheet" href="admin.css">
+
+</head>
+
+<body style="display:flex;justify-content:center;align-items:center;height:100vh;background:#f5f7fb;">
+
+<div style="background:white;padding:40px;border-radius:10px;width:320px;box-shadow:0 3px 10px rgba(0,0,0,0.1);">
+
+<h2 style="text-align:center;margin-bottom:20px;">ExamAI Admin Login</h2>
+
+<input id="username" type="text" placeholder="Admin Username">
+
+<input id="password" type="password" placeholder="Admin Password">
+
+<button onclick="login()" style="width:100%;margin-top:10px;">Login</button>
+
+<p id="error" style="color:red;margin-top:10px;text-align:center;"></p>
+
+</div>
+
+<script>
+
+const ADMIN_USER="admin"
+const ADMIN_PASS="examai123"
+
+function login(){
+
+let user=document.getElementById("username").value
+let pass=document.getElementById("password").value
+
+if(user===ADMIN_USER && pass===ADMIN_PASS){
+
+window.location.href="dashboard.html"
+
+}else{
+
+document.getElementById("error").innerText="Invalid username or password"
+
+}
+
+}
+
+</script>
+
+</body>
+
+</html>

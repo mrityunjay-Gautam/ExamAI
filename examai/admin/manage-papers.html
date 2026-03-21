@@ -1,0 +1,172 @@
+<h1>Manage Papers</h1>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Papers | ExamAI Admin</title>
+  <link rel="stylesheet" href="admin.css">
+  <style>
+    .paper-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:20px;
+      margin-top:30px;
+    }
+
+    .paper-card{
+      background:white;
+      padding:20px;
+      border-radius:12px;
+      box-shadow:0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    .paper-card h3{
+      margin-bottom:10px;
+      color:#4f46e5;
+    }
+
+    .paper-card p{
+      margin-bottom:8px;
+      font-size:14px;
+    }
+
+    .actions{
+      margin-top:14px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .open-btn{
+      background:#4f46e5;
+      color:white;
+      border:none;
+      padding:8px 12px;
+      border-radius:6px;
+      text-decoration:none;
+      display:inline-block;
+    }
+
+    .danger-btn{
+      background:#dc2626;
+      color:white;
+      border:none;
+      padding:8px 12px;
+      border-radius:6px;
+      cursor:pointer;
+    }
+
+    .type-badge{
+      display:inline-block;
+      margin-bottom:10px;
+      background:#eef2ff;
+      color:#4f46e5;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:600;
+      text-transform:capitalize;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="sidebar">
+    <h2>ExamAI Admin</h2>
+    <ul>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="subjects.html">Manage Subjects</a></li>
+      <li><a href="upload-paper.html">Upload Papers</a></li>
+      <li><a href="manage-papers.html">Manage Papers</a></li>
+      <li><a href="login.html">Logout</a></li>
+    </ul>
+  </div>
+
+  <div class="main">
+    <h1>Manage Papers</h1>
+    <div id="papersContainer" class="paper-grid">
+      <p>Loading papers...</p>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "http://localhost:5000/api"
+    const FILE_BASE = "http://localhost:5000"
+
+    async function loadPapers() {
+      const container = document.getElementById("papersContainer")
+      container.innerHTML = `<p>Loading papers...</p>`
+
+      try {
+        const response = await fetch(`${API_BASE}/papers`)
+        const data = await response.json()
+
+        if (!data.success || !data.papers || data.papers.length === 0) {
+          container.innerHTML = `<p>No papers found.</p>`
+          return
+        }
+
+        container.innerHTML = data.papers.map((paper) => {
+          const type = (paper.type || "").toLowerCase()
+
+          const details = type === "board"
+            ? `
+              <p><strong>Board:</strong> ${paper.board || "-"}</p>
+              <p><strong>Class:</strong> ${paper.className || "-"}</p>
+              <p><strong>Stream:</strong> ${paper.stream || "-"}</p>
+            `
+            : `
+              <p><strong>University:</strong> ${paper.university || "-"}</p>
+              <p><strong>Branch:</strong> ${paper.branch || "-"}</p>
+              <p><strong>Semester:</strong> ${paper.semester || "-"}</p>
+            `
+
+          return `
+            <div class="paper-card">
+              <div class="type-badge">${paper.type || "unknown"}</div>
+              <h3>${paper.subject || "Unknown Subject"}</h3>
+              ${details}
+              <div class="actions">
+                <a class="open-btn" href="${FILE_BASE}${paper.image}" target="_blank">Open</a>
+                <button class="danger-btn" onclick="deletePaper('${paper.id}')">Delete</button>
+              </div>
+            </div>
+          `
+        }).join("")
+      } catch (error) {
+        console.log("LOAD PAPERS ERROR:", error)
+        container.innerHTML = `<p>Failed to load papers.</p>`
+      }
+    }
+
+    async function deletePaper(id) {
+      const confirmDelete = confirm("Are you sure you want to delete this paper?")
+      if (!confirmDelete) return
+
+      try {
+        const response = await fetch(`${API_BASE}/papers/${id}`, {
+          method: "DELETE"
+        })
+
+        const data = await response.json()
+
+        if (data.success) {
+          loadPapers()
+        } else {
+          alert(data.message || "Failed to delete paper")
+        }
+      } catch (error) {
+        console.log("DELETE PAPER ERROR:", error)
+        alert("Failed to delete paper")
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", loadPapers)
+  </script>
+
+</body>
+
+</html>

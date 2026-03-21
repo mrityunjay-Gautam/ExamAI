@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boards | ExamAI</title>
+  <meta name="description" content="Browse board question papers on ExamAI.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    .boards-page {
+      width: min(var(--container), calc(100% - 14px));
+      margin: 18px auto 80px;
+    }
+
+    .boards-hero {
+      background:
+        radial-gradient(circle at top left, rgba(91, 92, 226, 0.12), transparent 24%),
+        linear-gradient(135deg, #f9fbff 0%, #eef2ff 50%, #ede9fe 100%);
+      border: 1px solid rgba(91, 92, 226, 0.10);
+      border-radius: 30px;
+      box-shadow: var(--shadow-lg);
+      padding: 26px 18px 22px;
+      overflow: hidden;
+    }
+
+    body.dark-mode .boards-hero {
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.05), transparent 24%),
+        linear-gradient(135deg, #111827 0%, #182235 50%, #1a1930 100%);
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+
+    .boards-hero-grid {
+      display: grid;
+      grid-template-columns: 1.08fr .92fr;
+      gap: 22px;
+      align-items: center;
+    }
+
+    .boards-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(91, 92, 226, 0.10);
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+
+    .boards-hero h1 {
+      font-size: clamp(30px, 5vw, 54px);
+      line-height: 1.12;
+      margin-bottom: 12px;
+      letter-spacing: -0.8px;
+    }
+
+    .boards-hero h1 span {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .boards-hero p {
+      color: var(--text-soft);
+      font-size: 15px;
+      line-height: 1.8;
+      margin-bottom: 18px;
+      max-width: 760px;
+    }
+
+    .boards-points {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .boards-point {
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    body.dark-mode .boards-point {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+
+    .boards-point strong {
+      display: block;
+      font-size: 17px;
+      margin-bottom: 4px;
+    }
+
+    .boards-point span {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text-soft);
+    }
+
+    .boards-preview-wrap {
+      display: grid;
+      gap: 14px;
+    }
+
+    .boards-preview-card {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .boards-preview-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .boards-preview-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .boards-preview-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .boards-mini-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .boards-mini-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .boards-mini-item strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+
+    .boards-mini-item span {
+      color: var(--text-soft);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .boards-layout {
+      display: grid;
+      grid-template-columns: .95fr 1.05fr;
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .boards-card {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+      text-align: left;
+    }
+
+    .boards-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .boards-card-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .boards-card h2 {
+      font-size: 24px;
+      margin-bottom: 8px;
+      line-height: 1.25;
+    }
+
+    .boards-card p {
+      color: var(--text-soft);
+      font-size: 14px;
+      line-height: 1.75;
+      margin-bottom: 10px;
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .field-wrap {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-soft);
+    }
+
+    .filter-grid input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 15px;
+      font-family: "Poppins", sans-serif;
+      font-size: 14px;
+      background: var(--bg-soft);
+      color: var(--text);
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    .filter-grid input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08);
+    }
+
+    .helper-note {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px 15px;
+      color: var(--text-soft);
+      line-height: 1.75;
+      font-size: 13px;
+      margin-top: 14px;
+    }
+
+    .filter-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .filter-actions .card-btn,
+    .filter-actions .btn-secondary {
+      width: 100%;
+      min-height: 50px;
+      border-radius: 16px;
+      padding: 12px 14px;
+      text-align: center;
+    }
+
+    .guide-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .guide-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+    }
+
+    .guide-index {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .guide-text {
+      color: var(--text-soft);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .results-zone {
+      margin-top: 22px;
+    }
+
+    .results-header-card {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .results-header-card h2 {
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .results-header-card p {
+      color: var(--text-soft);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .paper-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 0;
+    }
+
+    .paper-card {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: var(--shadow-sm);
+      text-align: left;
+      transition: 0.22s ease;
+    }
+
+    .paper-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow);
+    }
+
+    .paper-card h3 {
+      font-size: 20px;
+      margin-bottom: 12px;
+      line-height: 1.45;
+      color: var(--text);
+    }
+
+    .paper-meta {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text-soft);
+    }
+
+    .meta-label {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .paper-list {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .paper-list .card-btn {
+      min-height: 42px;
+      padding: 10px 16px;
+      border-radius: 14px;
+      font-size: 13px;
+    }
+
+    .loading-text {
+      margin-top: 18px;
+      text-align: center;
+      color: var(--text-soft);
+      font-weight: 600;
+      line-height: 1.7;
+    }
+
+    .empty-state {
+      background: var(--bg-soft);
+      border: 1px dashed var(--border-strong);
+      border-radius: 22px;
+      padding: 22px;
+      text-align: center;
+      color: var(--text-soft);
+      line-height: 1.8;
+      box-shadow: var(--shadow-sm);
+    }
+
+    @media(max-width:1100px) {
+      .boards-hero-grid,
+      .boards-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media(max-width:820px) {
+      .boards-points {
+        grid-template-columns: 1fr;
+      }
+
+      .filter-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .filter-actions {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media(max-width:640px) {
+      .boards-page {
+        width: calc(100% - 12px);
+        margin: 14px auto 60px;
+      }
+
+      .boards-hero {
+        border-radius: 24px;
+        padding: 18px 14px 16px;
+      }
+
+      .boards-card,
+      .results-header-card {
+        padding: 16px;
+        border-radius: 20px;
+      }
+
+      .boards-card h2,
+      .results-header-card h2 {
+        font-size: 20px;
+      }
+
+      .boards-card-header {
+        align-items: center;
+      }
+
+      .boards-card-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        font-size: 18px;
+      }
+
+      .paper-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .paper-card h3 {
+        font-size: 17px;
+      }
+
+      .paper-list .card-btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="navbar">
+    <div class="logo">
+      <div class="logo-mark">E</div>
+      <a href="index.html">ExamAI</a>
+    </div>
+
+    <div class="desktop-nav">
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="universities.html">Universities</a></li>
+        <li><a href="boards.html">Boards</a></li>
+        <li><a href="predictor.html">Predictor</a></li>
+        <li><a href="jee-neet.html">JEE / NEET</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="#boardSectionsContainer" class="btn">Browse Papers</a>
+      </div>
+    </div>
+
+    <button id="menuToggle" class="menu-toggle" aria-label="Open menu">☰</button>
+  </header>
+
+  <main class="boards-page">
+    <section class="boards-hero">
+      <div class="boards-hero-grid">
+        <div>
+          <div class="boards-kicker">
+            <span>●</span>
+            Organized board paper browsing
+          </div>
+
+          <h1>
+            Explore <span>board question papers</span> in a cleaner layout
+          </h1>
+
+          <p>
+            Search papers by board, class, stream, and subject.
+          </p>
+
+          <div class="boards-points">
+            <div class="boards-point">
+              <strong>Search</strong>
+              <span>Filter by board, class, stream, or subject in one simple flow.</span>
+            </div>
+            <div class="boards-point">
+              <strong>Browse</strong>
+              <span>See grouped paper cards with cleaner metadata and better spacing.</span>
+            </div>
+            <div class="boards-point">
+              <strong>Open</strong>
+              <span>Tap paper buttons easily even on small screens.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="boards-preview-wrap">
+          <div class="boards-preview-card">
+            <div class="boards-preview-top">
+              <div class="boards-preview-title">Section Preview</div>
+              <div class="boards-preview-pill">Grouped View</div>
+            </div>
+
+            <div class="boards-mini-list">
+              <div class="boards-mini-item">
+                <strong>Board</strong>
+                <span>Grouped by academic structure for cleaner browsing.</span>
+              </div>
+              <div class="boards-mini-item">
+                <strong>Class & Stream</strong>
+                <span>Easy section-based search with better mobile readability.</span>
+              </div>
+              <div class="boards-mini-item">
+                <strong>Papers</strong>
+                <span>Open one or multiple uploaded papers directly from each card.</span>
+              </div>
+            </div>
+          </div>
+
+        
+        </div>
+      </div>
+    </section>
+
+    <section class="boards-layout">
+      <div class="boards-card">
+        <div class="boards-card-header">
+          <div>
+            <h2>Search Board Papers</h2>
+            <p>Use the filters below to narrow down paper sections quickly without changing your current logic.</p>
+          </div>
+          <div class="boards-card-icon">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+        </div>
+
+        <div class="filter-grid">
+          <div class="field-wrap">
+            <label class="field-label" for="searchBoard">Board</label>
+            <input type="text" id="searchBoard" placeholder="Search board">
+          </div>
+
+          <div class="field-wrap">
+            <label class="field-label" for="searchClass">Class</label>
+            <input type="text" id="searchClass" placeholder="Search class">
+          </div>
+
+          <div class="field-wrap">
+            <label class="field-label" for="searchStream">Stream</label>
+            <input type="text" id="searchStream" placeholder="Search stream">
+          </div>
+
+          <div class="field-wrap">
+            <label class="field-label" for="searchBoardSubject">Subject</label>
+            <input type="text" id="searchBoardSubject" placeholder="Search subject">
+          </div>
+        </div>
+
+        <div class="helper-note">
+          You can fill one field or combine multiple filters. Results will stay grouped by board, class, stream, and subject.
+        </div>
+
+        <div class="filter-actions">
+          <button class="card-btn" onclick="filterBoardSections()">Search Sections</button>
+          <button class="btn-secondary" onclick="resetBoardSections()">Reset Filters</button>
+        </div>
+      </div>
+
+      <div class="boards-card">
+        <div class="boards-card-header">
+          <div>
+            <h2>How It Works</h2>
+            <p>Your existing fetch and grouping logic remain same. Only the frontend presentation is improved.</p>
+          </div>
+          <div class="boards-card-icon">
+            <i class="fa-solid fa-layer-group"></i>
+          </div>
+        </div>
+
+        <div class="guide-list">
+          <div class="guide-item">
+            <div class="guide-index">1</div>
+            <div class="guide-text">All uploaded board papers are loaded from your existing backend API.</div>
+          </div>
+          <div class="guide-item">
+            <div class="guide-index">2</div>
+            <div class="guide-text">Papers are grouped by board, class, stream, and subject.</div>
+          </div>
+          <div class="guide-item">
+            <div class="guide-index">3</div>
+            <div class="guide-text">Search filters help students narrow down sections faster on mobile.</div>
+          </div>
+          <div class="guide-item">
+            <div class="guide-index">4</div>
+            <div class="guide-text">Each matching card can contain one or more paper links to open.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="results-zone">
+      <div class="results-header-card">
+        <h2>Available Board Paper Sections</h2>
+        <p>
+          Matching grouped sections will appear below. The card layout is now easier to scan and use on mobile devices.
+        </p>
+      </div>
+
+      <div id="boardSectionsContainer" class="paper-grid"></div>
+      <p id="boardLoadingText" class="loading-text">Loading board papers...</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-shell">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <h3>ExamAI</h3>
+          <p>AI Powered Exam Preparation Platform for JEE, NEET, boards, and university students.</p>
+          <div class="made-by">WebApp made by <strong>Jay (Mrityunjay Gautam)</strong></div>
+        </div>
+
+        <div class="footer-group">
+          <h4>Quick Links</h4>
+          <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="universities.html">Universities</a>
+            <a href="boards.html">Boards</a>
+            <a href="predictor.html">Question Predictor</a>
+            <a href="jee-neet.html">JEE / NEET Practice</a>
+          </div>
+        </div>
+
+        <div class="footer-group">
+          <h4>Connect</h4>
+          <div class="social-row">
+            <a class="social-link" href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+              <i class="fa-brands fa-linkedin-in"></i>
+            </a>
+            <a class="social-link" href="https://github.com/" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+              <i class="fa-brands fa-github"></i>
+            </a>
+            <a class="social-link" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <i class="fa-brands fa-instagram"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 ExamAI. All rights reserved.</span>
+        
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    let allBoardPapers = []
+    let groupedBoardSections = []
+
+    function groupBoardSections(papers) {
+      const groups = {}
+
+      papers.forEach((paper) => {
+        const key = [
+          paper.board || "",
+          paper.className || "",
+          paper.stream || "",
+          paper.subject || ""
+        ].join("|")
+
+        if (!groups[key]) {
+          groups[key] = {
+            board: paper.board || "-",
+            className: paper.className || "-",
+            stream: paper.stream || "-",
+            subject: paper.subject || "Unknown Subject",
+            papers: []
+          }
+        }
+
+        groups[key].papers.push(paper)
+      })
+
+      return Object.values(groups)
+    }
+
+    async function loadBoardSections() {
+      const container = document.getElementById("boardSectionsContainer")
+      const loadingText = document.getElementById("boardLoadingText")
+
+      container.innerHTML = ""
+      loadingText.innerText = "Loading board papers..."
+
+      try {
+        const response = await fetch("http://localhost:5000/api/papers/board")
+        const data = await response.json()
+
+        console.log("BOARD API DATA:", data)
+
+        if (!data.success) {
+          loadingText.innerText = data.message || "Failed to load board papers."
+          return
+        }
+
+        allBoardPapers = Array.isArray(data.papers) ? data.papers : []
+        groupedBoardSections = groupBoardSections(allBoardPapers)
+
+        if (groupedBoardSections.length === 0) {
+          loadingText.innerText = "No board papers found."
+          return
+        }
+
+        renderBoardSections(groupedBoardSections)
+        loadingText.innerText = ""
+      } catch (error) {
+        console.log("BOARD PAGE ERROR:", error)
+        loadingText.innerText = "Failed to load board papers."
+      }
+    }
+
+    function renderBoardSections(sections) {
+      const container = document.getElementById("boardSectionsContainer")
+
+      if (!sections.length) {
+        container.innerHTML = `<div class="empty-state">No matching board sections found.</div>`
+        return
+      }
+
+      container.innerHTML = sections.map((section) => `
+        <div class="paper-card">
+          <h3>${section.subject}</h3>
+
+          <div class="paper-meta">
+            <div class="meta-row"><span class="meta-label">Board:</span> <span>${section.board}</span></div>
+            <div class="meta-row"><span class="meta-label">Class:</span> <span>${section.className}</span></div>
+            <div class="meta-row"><span class="meta-label">Stream:</span> <span>${section.stream}</span></div>
+          </div>
+
+          <div class="paper-list">
+            ${section.papers.map((paper, index) => `
+              <a class="card-btn" href="http://localhost:5000${paper.image}" target="_blank">
+                Open Paper ${index + 1}
+              </a>
+            `).join("")}
+          </div>
+        </div>
+      `).join("")
+    }
+
+    function filterBoardSections() {
+      const board = document.getElementById("searchBoard").value.toLowerCase().trim()
+      const className = document.getElementById("searchClass").value.toLowerCase().trim()
+      const stream = document.getElementById("searchStream").value.toLowerCase().trim()
+      const subject = document.getElementById("searchBoardSubject").value.toLowerCase().trim()
+
+      const filtered = groupedBoardSections.filter((section) => {
+        const boardMatch = !board || section.board.toLowerCase().includes(board)
+        const classMatch = !className || section.className.toLowerCase().includes(className)
+        const streamMatch = !stream || section.stream.toLowerCase().includes(stream)
+        const subjectMatch = !subject || section.subject.toLowerCase().includes(subject)
+
+        return boardMatch && classMatch && streamMatch && subjectMatch
+      })
+
+      renderBoardSections(filtered)
+
+      const loadingText = document.getElementById("boardLoadingText")
+      loadingText.innerText = filtered.length ? "" : "No matching board sections found."
+    }
+
+    function resetBoardSections() {
+      document.getElementById("searchBoard").value = ""
+      document.getElementById("searchClass").value = ""
+      document.getElementById("searchStream").value = ""
+      document.getElementById("searchBoardSubject").value = ""
+
+      renderBoardSections(groupedBoardSections)
+
+      const loadingText = document.getElementById("boardLoadingText")
+      loadingText.innerText = groupedBoardSections.length ? "" : "No board papers found."
+    }
+
+    window.addEventListener("DOMContentLoaded", loadBoardSections)
+  </script>
+
+</body>
+
+</html>

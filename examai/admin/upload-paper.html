@@ -1,0 +1,227 @@
+<h1>Upload Question Paper</h1>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Question Paper | ExamAI Admin</title>
+  <link rel="stylesheet" href="admin.css">
+  <style>
+    .success-text{
+      color:green;
+      margin-top:10px;
+    }
+
+    .error-text{
+      color:red;
+      margin-top:10px;
+    }
+
+    .preview-box{
+      margin-top:20px;
+      background:white;
+      padding:20px;
+      border-radius:12px;
+      box-shadow:0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    .preview-box p{
+      margin-bottom:8px;
+      font-size:14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="sidebar">
+    <h2>ExamAI Admin</h2>
+    <ul>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="subjects.html">Manage Subjects</a></li>
+      <li><a href="upload-paper.html">Upload Papers</a></li>
+      <li><a href="manage-papers.html">Manage Papers</a></li>
+      <li><a href="login.html">Logout</a></li>
+    </ul>
+  </div>
+
+  <div class="main">
+    <h1>Upload Question Paper</h1>
+
+    <div class="card">
+      <label style="display:block;margin-bottom:8px;font-weight:600;">Select Subject</label>
+      <select id="subjectSelect">
+        <option value="">Loading subjects...</option>
+      </select>
+
+      <input id="type" type="text" placeholder="Type" readonly>
+      <input id="university" type="text" placeholder="University" readonly>
+      <input id="branch" type="text" placeholder="Branch" readonly>
+      <input id="semester" type="text" placeholder="Semester" readonly>
+      <input id="board" type="text" placeholder="Board" readonly>
+      <input id="className" type="text" placeholder="Class" readonly>
+      <input id="stream" type="text" placeholder="Stream" readonly>
+      <input id="subject" type="text" placeholder="Subject" readonly>
+
+      <input id="paper" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp">
+
+      <button onclick="uploadPaper()">Upload Paper</button>
+      <p id="uploadMessage"></p>
+    </div>
+
+    <div class="preview-box">
+      <h3 style="margin-bottom:12px;">Selected Subject Details</h3>
+      <p><strong>Type:</strong> <span id="previewType">-</span></p>
+      <p><strong>University:</strong> <span id="previewUniversity">-</span></p>
+      <p><strong>Branch:</strong> <span id="previewBranch">-</span></p>
+      <p><strong>Semester:</strong> <span id="previewSemester">-</span></p>
+      <p><strong>Board:</strong> <span id="previewBoard">-</span></p>
+      <p><strong>Class:</strong> <span id="previewClass">-</span></p>
+      <p><strong>Stream:</strong> <span id="previewStream">-</span></p>
+      <p><strong>Subject:</strong> <span id="previewSubject">-</span></p>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "http://localhost:5000/api"
+    let allSubjects = []
+
+    async function loadSubjectsForDropdown() {
+      const select = document.getElementById("subjectSelect")
+      select.innerHTML = `<option value="">Loading subjects...</option>`
+
+      try {
+        const response = await fetch(`${API_BASE}/subjects`)
+        const data = await response.json()
+
+        if (!data.success || !data.subjects || data.subjects.length === 0) {
+          select.innerHTML = `<option value="">No subjects available</option>`
+          return
+        }
+
+        allSubjects = data.subjects
+
+        select.innerHTML = `<option value="">Select a subject</option>` + data.subjects.map((item) => {
+          const label = item.type === "university"
+            ? `${item.university} | ${item.branch} | Semester ${item.semester} | ${item.subject}`
+            : `${item.board} | Class ${item.className} | ${item.stream || "-"} | ${item.subject}`
+
+          return `<option value="${item.id}">${label}</option>`
+        }).join("")
+      } catch (error) {
+        console.log("LOAD SUBJECTS DROPDOWN ERROR:", error)
+        select.innerHTML = `<option value="">Failed to load subjects</option>`
+      }
+    }
+
+    function updateSelectedSubjectDetails() {
+      const selectedId = document.getElementById("subjectSelect").value
+      const selectedSubject = allSubjects.find(item => item.id === selectedId)
+
+      if (!selectedSubject) {
+        document.getElementById("type").value = ""
+        document.getElementById("university").value = ""
+        document.getElementById("branch").value = ""
+        document.getElementById("semester").value = ""
+        document.getElementById("board").value = ""
+        document.getElementById("className").value = ""
+        document.getElementById("stream").value = ""
+        document.getElementById("subject").value = ""
+
+        document.getElementById("previewType").innerText = "-"
+        document.getElementById("previewUniversity").innerText = "-"
+        document.getElementById("previewBranch").innerText = "-"
+        document.getElementById("previewSemester").innerText = "-"
+        document.getElementById("previewBoard").innerText = "-"
+        document.getElementById("previewClass").innerText = "-"
+        document.getElementById("previewStream").innerText = "-"
+        document.getElementById("previewSubject").innerText = "-"
+        return
+      }
+
+      document.getElementById("type").value = selectedSubject.type || ""
+      document.getElementById("university").value = selectedSubject.university || ""
+      document.getElementById("branch").value = selectedSubject.branch || ""
+      document.getElementById("semester").value = selectedSubject.semester || ""
+      document.getElementById("board").value = selectedSubject.board || ""
+      document.getElementById("className").value = selectedSubject.className || ""
+      document.getElementById("stream").value = selectedSubject.stream || ""
+      document.getElementById("subject").value = selectedSubject.subject || ""
+
+      document.getElementById("previewType").innerText = selectedSubject.type || "-"
+      document.getElementById("previewUniversity").innerText = selectedSubject.university || "-"
+      document.getElementById("previewBranch").innerText = selectedSubject.branch || "-"
+      document.getElementById("previewSemester").innerText = selectedSubject.semester || "-"
+      document.getElementById("previewBoard").innerText = selectedSubject.board || "-"
+      document.getElementById("previewClass").innerText = selectedSubject.className || "-"
+      document.getElementById("previewStream").innerText = selectedSubject.stream || "-"
+      document.getElementById("previewSubject").innerText = selectedSubject.subject || "-"
+    }
+
+    async function uploadPaper() {
+      const type = document.getElementById("type").value.trim()
+      const university = document.getElementById("university").value.trim()
+      const branch = document.getElementById("branch").value.trim()
+      const semester = document.getElementById("semester").value.trim()
+      const board = document.getElementById("board").value.trim()
+      const className = document.getElementById("className").value.trim()
+      const stream = document.getElementById("stream").value.trim()
+      const subject = document.getElementById("subject").value.trim()
+      const file = document.getElementById("paper").files[0]
+      const message = document.getElementById("uploadMessage")
+
+      if (!type || !subject) {
+        message.className = "error-text"
+        message.innerText = "Please select a subject first."
+        return
+      }
+
+      if (!file) {
+        message.className = "error-text"
+        message.innerText = "Please choose a file."
+        return
+      }
+
+      const formData = new FormData()
+      formData.append("type", type)
+      formData.append("university", university)
+      formData.append("branch", branch)
+      formData.append("semester", semester)
+      formData.append("board", board)
+      formData.append("className", className)
+      formData.append("stream", stream)
+      formData.append("subject", subject)
+      formData.append("paper", file)
+
+      try {
+        const response = await fetch(`${API_BASE}/upload-paper`, {
+          method: "POST",
+          body: formData
+        })
+
+        const data = await response.json()
+
+        if (data.success) {
+          message.className = "success-text"
+          message.innerText = data.message
+          document.getElementById("paper").value = ""
+        } else {
+          message.className = "error-text"
+          message.innerText = data.message || "Upload failed"
+        }
+      } catch (error) {
+        console.log("UPLOAD PAPER ERROR:", error)
+        message.className = "error-text"
+        message.innerText = "Upload failed"
+      }
+    }
+
+    document.getElementById("subjectSelect").addEventListener("change", updateSelectedSubjectDetails)
+
+    window.addEventListener("DOMContentLoaded", loadSubjectsForDropdown)
+  </script>
+
+</body>
+
+</html>
