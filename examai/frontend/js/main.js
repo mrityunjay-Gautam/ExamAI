@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:5000/api"
+const API_BASE_URL = "https://examai-6mav.onrender.com/api"
 
 const SOCIAL_LINKS = {
   linkedin: "https://www.linkedin.com/in/mrityunjay-gautam-693123253?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
