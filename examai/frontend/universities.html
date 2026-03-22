@@ -760,7 +760,7 @@
       loadingText.innerText = "Loading university papers..."
 
       try {
-        const response = await fetch("http://localhost:5000/api/papers/university")
+        const response = await fetch("https://examai-6mav.onrender.com/api/papers/university")
         const data = await response.json()
 
         console.log("UNIVERSITY API DATA:", data)
