@@ -759,7 +759,7 @@
       loadingText.innerText = "Loading board papers..."
 
       try {
-        const response = await fetch("http://localhost:5000/api/papers/board")
+      const response = await fetch("https://examai-6mav.onrender.com/api/papers/board")
         const data = await response.json()
 
         console.log("BOARD API DATA:", data)
