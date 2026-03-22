@@ -1,4 +1,4 @@
-const API_BASE = https://examai-6mav.onrender.com/api
+const API_BASE = "https://examai-6mav.onrender.com/api"
 
 async function predictQuestions(count) {
   const questions = document.getElementById("questionsInput").value.trim()
